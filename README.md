@@ -1,14 +1,14 @@
-# Deploying a Rails-React App to Heroku
+# Deploying a Rails-React App to Render
 
 ## Learning Goals
 
 - Understand the React build process and how to serve a React app from Rails
 - Understand challenges of client-side routing in a deployed application
-- Deploy a Rails API with a React frontend to Heroku
+- Deploy a Rails API with a React frontend to Render
 
 ## Introduction
 
-In the previous lesson, we deployed a small Rails API application to Heroku to
+In the previous lesson, we deployed a small Rails API application to Render to
 learn how the deployment process works in general, and what steps are required
 to take the code from our machine and get it to run on a server.
 
@@ -19,28 +19,22 @@ together on a single server.
 ## Setup
 
 To follow along with this lesson, we have a pre-built React-Rails application
-that you'll be deploying to Heroku. To start, head to this link, and **fork**
+that you'll be deploying to Render. To start, head to this link, and **fork**
 and **clone** the repository there:
 
-- [https://github.com/learn-co-curriculum/phase-4-deploying-demo-app](https://github.com/learn-co-curriculum/phase-4-deploying-demo-app)
+- [https://github.com/learn-co-curriculum/phase-4-deploying-demo-app-render](https://github.com/learn-co-curriculum/phase-4-deploying-demo-app-render)
 
 After downloading the code, set up the repository locally:
 
 ```console
 $ bundle install
-$ rails db:create db:migrate db:seed
+$ rails db:create db:migrate
 $ npm install --prefix client
 ```
 
 This application has a Rails API with session-based authentication, a React
-frontend using React Router for client-side routing, and Postgresql for the
+frontend using React Router for client-side routing, and PostgreSQL for the
 database.
-
-You can run the app locally (assuming you have the Heroku CLI installed) with:
-
-```console
-$ heroku local -f Procfile.dev
-```
 
 Spend some time familiarizing yourself with the code for the demo app before
 proceeding. We'll be walking through its setup and why certain choices were
@@ -229,9 +223,9 @@ page. Comment that line back in, and make the same request. Success!
 
 Now that you've seen how to create a production version of our React app
 locally, and tackled some thorny client-side routing issues, let's talk about
-how to deploy the application to Heroku.
+how to deploy the application to Render.
 
-## Heroku Build Process
+## Render Build Process
 
 Think about the steps to build our React application locally. What did we have
 to do to build the React application in such a way that it could be served by
@@ -244,78 +238,125 @@ our Rails application? Well, we had to:
 
 We would also need to repeat these steps any time we made any changes to the
 React code, i.e., to anything in the `client` folder. Ideally, we'd like to be
-able to **automate** those steps when we deploy this app to Heroku, so we can
-just push up new versions of our code to Heroku and deploy them like we were
+able to **automate** those steps when we deploy this app to Render, so we can
+just push up new versions of our code to GitHub and deploy them like we were
 able to do in the previous lesson.
 
-Thankfully, Heroku lets us do just that! Let's get started with the deploying
-process and talk through how this automation works.
+Thankfully, we already have something that will help us do that! Recall from the
+last lesson that one of the deployment steps was to create a build script in the
+`bin` directory. If you look in the `bin` directory of our demo app, you'll see
+a `recipes-build.sh` file that contains the following:
 
-First, in the demo project directory, create a new app on Heroku:
+```bash
+#!/usr/bin/env bash
+# exit on error
+set -o errexit
 
-```console
-$ heroku create
+bundle install
+bundle exec rake db:migrate 
+bundle exec rake db:seed
 ```
 
-Next, we'll need to tell Heroku that this project is not **just** a Rails
-project; we'll need to run some **NodeJS** code as well in order to execute the
-build scripts for our React application. We can do this via Heroku
-[buildpacks][buildpacks]:
+This file runs the commands to build the Rails API portion of our app when
+changes are pushed to GitHub. All we need to do is add the corresponding
+commands for the front end:
 
-```console
-$ heroku buildpacks:add heroku/nodejs --index 1
-$ heroku buildpacks:add heroku/ruby --index 2
+```bash
+#!/usr/bin/env bash
+# exit on error
+set -o errexit
+
+# Add build commands for front end
+rm -rf public
+npm install --prefix client && npm run build --prefix client
+cp -a client/build/. public/
+
+bundle install
+bundle exec rake db:migrate 
+bundle exec rake db:seed
 ```
 
-This will tell Heroku to first run a build script for our React app using NodeJS
-before running the build script for our Rails app (running `bundle install` and
-`rails s`).
+The code we added does the following whenever a build is launched:
 
-To deploy the app, just like before, run:
+- Removes the `public` folder that contains the current front end production
+  build.
+- Installs the dependencies for the app.
+- Runs the production build.
+- Recreates the `public` directory and copies the new production build files
+  into it.
 
-```console
-$ git push heroku main
+Finally, we need to run the following command in the terminal to make sure the
+script is executable:
+
+```sh
+chmod a+x bin/recipes-build.sh
 ```
 
-This will kick off the build process on Heroku for the React app, then the Rails
-app next. You should be able to visit the deployed site now and see the full
-project live on the internet!
+With this build script, any time we make a change to our app — in either the
+front end or the back end — all we need to do is push the changes to GitHub and
+relaunch the build from the Render dashboard!
 
-To explain the React build process further: we have defined a NodeJS build
-process for the React app in the `package.json` file in the **root** directory
-of this project. It looks like this:
+## Creating the Master Key File
 
-```json
-{
-  "name": "phase-4-deploying-app-demo",
-  "description": "Build scripts for Heroku",
-  "engines": {
-    "node": "16.x"
-  },
-  "scripts": {
-    "clean": "rm -rf public",
-    "build": "npm install --prefix client && npm run build --prefix client",
-    "deploy": "cp -a client/build/. public/",
-    "heroku-postbuild": "npm run clean && npm run build && npm run deploy"
-  }
-}
+You may recall that, in the last lesson, we made edits to several files to
+configure the app for Render. Those edits have all been made to the demo app's
+files. However, there is one thing missing.
+
+Recall that when we created the Web Service on Render, we added an environment
+variable called `RAILS_MASTER_KEY` and pasted in the value that's in the
+`config/master.key` file. If you look in the `config` folder for the demo app,
+however, you'll see that file isn't there.
+
+When you create a Rails app from scratch, the `master.key` file is automatically
+created. However, this file contains secure information so it should not be
+pushed to GitHub. If you look in the `.gitignore` file, you'll see it listed
+there. As a result, when you fork and clone a repo from GitHub (as you did with
+the demo app), the `master.key` file will not be present. So we need to create
+it.
+
+To do that, first delete the `config/credentials.yml.enc` file, which holds the
+encrypted version of the key. Then run the following command in the terminal:
+
+```sh
+EDITOR="code --wait" bin/rails credentials:edit
 ```
 
-In this file, the `heroku-postbuild` script is the one that will run in Heroku
-when we deploy the app. This is the script that automates the steps we outlined
-above for building the React app. If you take a closer look at exactly what that
-script does, you'll see that it's simply calling each of the other three scripts
-we've defined. These scripts run a series of commands to:
+**Note**: if you use a different text editor than VS Code, you will need to replace
+`code` with the appropriate command.
 
-- Clean up any old files in the public directory
-- Install dependencies and build the React app
-- Move the built React app to the `public` folder
+The command above will open a file in VS Code and "wait" for you to close it
+before completing the process of creating the credential files. You can edit the
+secret key base in the file if you choose, but we'll leave it as is, so go ahead
+and close the file. The command in the terminal will now complete, and you
+should see both the `credentials.yml.enc` and `master.key` files in the `config`
+folder.
 
-A big part of the deployment process is automating features like this to make
-future deployments easier. We could have handled this process manually by
-running some additional commands on the Heroku server after deploying, but then
-we (or other developers) would need to remember to run those same steps any time
-changes are made to the React app.
+See the Rails Guide on [Environmental Security][rails security] if you'd like
+more information about these files.
+
+## Deploy to Render
+
+We're now ready to create a new Web Service on Render and deploy the app. Go
+ahead and and commit and push your changes, then follow the steps below. If you
+need a refresher on any of them, look back at the previous lesson.
+
+1. Go to the Render dashboard and create a new Web Service.
+2. Give the app a name and set the Environment to Ruby.
+3. Enter the build command (`./bin/recipes-build.sh`) and start command (`bundle
+   exec puma -C config/puma.rb`)
+4. Add the `DATABASE_URL` environment variable; enter the same database url that
+   you used for the previous lesson as the value. ## NOTE: This database issue
+   needs to be addressed in the previous lesson and this section updated
+   appropriately ##
+5. Add the `RAILS_MASTER_KEY` environment variable; enter the key contained in
+   the `master.key` file we created above as the value.
+6. Click the "Create Web Service" button at the bottom of the page.
+
+## Making an Update
+
+Try making a minor change in the app's front end. Commit and push the changes,
+then launch a new build from the Render dashboard. Once the deploy is complete,
+verify that our updated build script has deployed the change.
 
 ## Conclusion
 
@@ -325,8 +366,8 @@ The upside to this approach is we get to leverage the strengths of each of the
 tools we're using: React for a speedy, responsive user interface, and Rails for
 a robust, well-designed backend to communicate with the database.
 
-By spending some time upfront to understand and automate parts of the deployment
-process, we can make future deployments simpler.
+By spending some time up front to understand and automate parts of the
+deployment process, we can make future deployments simpler.
 
 For your future projects using a React frontend and Rails API backend, we'll
 provide a template project to use so you don't have to worry about configuring
@@ -339,13 +380,13 @@ or troubleshoot issues related to deployments in the future.
 Before you move on, make sure you can answer the following questions:
 
 1. Why does deploying the production version of our Rails/React app lead to
-   routing problems? How can we modify our routes to fix the issue?
-2. How does adding a NodeJS build process to the `package.json` file help us?
+   routing problems? What are the two ways we can fix the issue?
 
 ## Resources
 
-- [Heroku Rails-React Setup](https://blog.heroku.com/a-rock-solid-modern-web-stack)
-- [Demo App](https://github.com/learn-co-curriculum/phase-4-deploying-demo-app)
+- [Render Rails-React Setup](https://blog.Render.com/a-rock-solid-modern-web-stack)
+- [Demo App](https://github.com/learn-co-curriculum/phase-4-deploying-demo-app-render)
 
-[buildpacks]: https://devcenter.heroku.com/articles/using-multiple-buildpacks-for-an-app
 [namespacing]: https://guides.rubyonrails.org/routing.html#controller-namespaces-and-routing
+[rails security]: https://guides.rubyonrails.org/security.html#environmental-security
+[client-side routing]: https://render.com/docs/deploy-create-react-app#using-client-side-routing
