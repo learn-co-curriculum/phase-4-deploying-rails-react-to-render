@@ -289,7 +289,7 @@ Finally, we need to run the following command in the terminal to make sure the
 script is executable:
 
 ```sh
-chmod a+x bin/recipes-build.sh
+$ chmod a+x bin/recipes-build.sh
 ```
 
 With this build script, any time we make a change to our app — in either the
@@ -318,7 +318,7 @@ To do that, first delete the `config/credentials.yml.enc` file, which holds the
 encrypted version of the key. Then run the following command in the terminal:
 
 ```sh
-EDITOR="code --wait" bin/rails credentials:edit
+$ EDITOR="code --wait" bin/rails credentials:edit
 ```
 
 **Note**: if you use a different text editor than VS Code, you will need to replace
@@ -340,7 +340,7 @@ We're now ready to create a new database and Web Service and deploy the app to
 Render. Go ahead and and commit and push your changes, then follow the steps
 below. If you need a refresher on any of them, look back at the previous lesson.
 
-1. Go to the Render dashboard, click on your PostgreSAQL instance, and copy the
+1. Go to the Render dashboard, click on your PostgreSQL instance, and copy the
    PSQL connection command.
 2. Run the command in the terminal to open the PSQL terminal, then use the SQL
    "CREATE DATABASE" command to create a new database for the app (e.g.,
@@ -359,7 +359,8 @@ below. If you need a refresher on any of them, look back at the previous lesson.
 
 Try making a minor change in the app's front end. Commit and push the changes,
 then launch a new build from the Render dashboard. Once the deploy is complete,
-verify that our updated build script has deployed the change.
+refresh the page and verify that our updated build script has deployed the
+change.
 
 ## Conclusion
 
