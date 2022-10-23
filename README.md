@@ -242,7 +242,7 @@ able to **automate** those steps when we deploy this app to Render, so we can
 just push up new versions of our code to GitHub and deploy them like we were
 able to do in the previous lesson.
 
-Thankfully, we already have something that will help us do that! Recall from the
+Luckily, we already have something that will help us do that! Recall from the
 last lesson that one of the deployment steps was to create a build script in the
 `bin` directory. If you look in the `bin` directory of our demo app, you'll see
 a `recipes-build.sh` file that contains the following:
@@ -336,21 +336,24 @@ more information about these files.
 
 ## Deploy to Render
 
-We're now ready to create a new Web Service on Render and deploy the app. Go
-ahead and and commit and push your changes, then follow the steps below. If you
-need a refresher on any of them, look back at the previous lesson.
+We're now ready to create a new database and Web Service and deploy the app to
+Render. Go ahead and and commit and push your changes, then follow the steps
+below. If you need a refresher on any of them, look back at the previous lesson.
 
-1. Go to the Render dashboard and create a new Web Service.
-2. Give the app a name and set the Environment to Ruby.
-3. Enter the build command (`./bin/recipes-build.sh`) and start command (`bundle
+1. Go to the Render dashboard, click on your PostgreSAQL instance, and copy the
+   PSQL connection command.
+2. Run the command in the terminal to open the PSQL terminal, then use the SQL
+   "CREATE DATABASE" command to create a new database for the app (e.g.,
+   `recipe_app_db`). Exit PSQL with the `\q` command.
+3. Return to the Render dashboard and create a new Web Service.
+4. Give the app a name and set the Environment to Ruby.
+5. Enter the build command (`./bin/recipes-build.sh`) and start command (`bundle
    exec puma -C config/puma.rb`)
-4. Add the `DATABASE_URL` environment variable; enter the same database url that
-   you used for the previous lesson as the value. ## NOTE: This database issue
-   needs to be addressed in the previous lesson and this section updated
-   appropriately ##
-5. Add the `RAILS_MASTER_KEY` environment variable; enter the key contained in
+6. Add the `DATABASE_URL` environment variable; be sure to change the database
+   name in the URL to `recipe_app_db` (or whatever you named it).
+7. Add the `RAILS_MASTER_KEY` environment variable; enter the key contained in
    the `master.key` file we created above as the value.
-6. Click the "Create Web Service" button at the bottom of the page.
+8. Click the "Create Web Service" button at the bottom of the page.
 
 ## Making an Update
 
