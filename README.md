@@ -254,7 +254,6 @@ set -o errexit
 
 bundle install
 bundle exec rake db:migrate 
-bundle exec rake db:seed
 ```
 
 This file runs the commands to build the Rails API portion of our app when
@@ -273,7 +272,6 @@ cp -a client/build/. public/
 
 bundle install
 bundle exec rake db:migrate 
-bundle exec rake db:seed
 ```
 
 The code we added does the following whenever a build is launched:
@@ -337,23 +335,24 @@ more information about these files.
 ## Deploy to Render
 
 We're now ready to create a new database and Web Service and deploy the app to
-Render. Go ahead and and commit and push your changes, then follow the steps
-below. If you need a refresher on any of them, look back at the previous lesson.
+Render. If you need a refresher on any of the steps below, look back at the
+previous lesson.
 
-1. Go to the Render dashboard, click on your PostgreSQL instance, and copy the
+1. Commit and push your latest changes.
+2. Go to the Render dashboard, click on your PostgreSQL instance, and copy the
    PSQL connection command.
-2. Run the command in the terminal to open the PSQL terminal, then use the SQL
+3. Run the command in the terminal to open the PSQL terminal, then use the SQL
    "CREATE DATABASE" command to create a new database for the app (e.g.,
    `recipe_app_db`). Exit PSQL with the `\q` command.
-3. Return to the Render dashboard and create a new Web Service.
-4. Give the app a name and set the Environment to Ruby.
-5. Enter the build command (`./bin/recipes-build.sh`) and start command (`bundle
+4. Return to the Render dashboard and create a new Web Service.
+5. Give the app a name and set the Environment to Ruby.
+6. Enter the build command (`./bin/recipes-build.sh`) and start command (`bundle
    exec puma -C config/puma.rb`)
-6. Add the `DATABASE_URL` environment variable; be sure to change the database
+7. Add the `DATABASE_URL` environment variable; be sure to change the database
    name in the URL to `recipe_app_db` (or whatever you named it).
-7. Add the `RAILS_MASTER_KEY` environment variable; enter the key contained in
+8. Add the `RAILS_MASTER_KEY` environment variable; enter the key contained in
    the `master.key` file we created above as the value.
-8. Click the "Create Web Service" button at the bottom of the page.
+9. Click the "Create Web Service" button at the bottom of the page.
 
 ## Making an Update
 
