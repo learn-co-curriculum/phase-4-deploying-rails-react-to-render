@@ -8,7 +8,7 @@
 
 ## Introduction
 
-In the previous lesson, we deployed a small Rails API application to Render to
+Earlier in this section, we deployed a small Rails API application to Render to
 learn how the deployment process works in general, and what steps are required
 to take the code from our machine and get it to run on a server.
 
@@ -131,11 +131,11 @@ it: how can we deal with client-side routing?
 
 ### Configuring Rails for Client-Side Routing
 
-In our React application, we're using React Router to handle client-side
-routing. Client-side routing means that a user should be able to navigate to the
-React application, load all the HTML/CSS/JavaScript code just **once**, and then
-click through links in our site to navigate to different pages without making
-another request to the server for a new HTML document.
+In our React application, we're using React Router to handle [client-side
+routing][]. Client-side routing means that a user should be able to navigate to
+the React application, load all the HTML/CSS/JavaScript code just **once**, and
+then click through links in our site to navigate to different pages without
+making another request to the server for a new HTML document.
 
 We have two client-side routes defined:
 
@@ -240,12 +240,12 @@ We would also need to repeat these steps any time we made any changes to the
 React code, i.e., to anything in the `client` folder. Ideally, we'd like to be
 able to **automate** those steps when we deploy this app to Render, so we can
 just push up new versions of our code to GitHub and deploy them like we were
-able to do in the previous lesson.
+able to do in the earlier lesson.
 
 Luckily, we already have something that will help us do that! Recall from the
-last lesson that one of the deployment steps was to create a build script in the
-`bin` directory. If you look in the `bin` directory of our demo app, you'll see
-a `recipes-build.sh` file that contains the following:
+earlier lesson that one of the deployment steps was to create a build script in
+the `bin` directory. If you look in the `bin` directory of our demo app, you'll
+see a `recipes-build.sh` file that contains the following:
 
 ```bash
 #!/usr/bin/env bash
@@ -296,14 +296,15 @@ relaunch the build from the Render dashboard!
 
 ## Creating the Master Key File
 
-You may recall that, in the last lesson, we made edits to several files to
-configure the app for Render. Those edits have all been made to the demo app's
-files. However, there is one thing missing.
+You may recall that, when we set up our Rails API for deployment earlier in this
+section, we had to make edits to several files. Those edits have all been made
+to the demo app's files, so you won't need to do those steps again. However,
+there is one thing missing.
 
 Recall that when we created the Web Service on Render, we added an environment
 variable called `RAILS_MASTER_KEY` and pasted in the value that's in the
 `config/master.key` file. If you look in the `config` folder for the demo app,
-however, you'll see that file isn't there.
+you'll see that file isn't there.
 
 When you create a Rails app from scratch, the `master.key` file is automatically
 created. However, this file contains secure information so it should not be
@@ -336,20 +337,25 @@ more information about these files.
 
 We're now ready to create a new database and Web Service and deploy the app to
 Render. If you need a refresher on any of the steps below, look back at the
-previous lesson.
+earlier lesson.
 
-1. Commit and push your latest changes.
-2. Go to the Render dashboard, click on your PostgreSQL instance, and copy the
-   PSQL connection command.
+1. Commit and push your latest changes to GitHub.
+2. Go to the Render dashboard, click on your PostgreSQL instance, scroll down to
+   the "Connection" section, and copy the "PSQL Command."
 3. Run the command in the terminal to open the PSQL terminal, then use the SQL
-   "CREATE DATABASE" command to create a new database for the app (e.g.,
-   `recipe_app_db`). Exit PSQL with the `\q` command.
-4. Return to the Render dashboard and create a new Web Service.
-5. Give the app a name and set the Environment to Ruby.
-6. Enter the build command (`./bin/recipes-build.sh`) and start command (`bundle
-   exec puma -C config/puma.rb`)
-7. Add the `DATABASE_URL` environment variable; be sure to change the database
-   name in the URL to `recipe_app_db` (or whatever you named it).
+   command `CREATE DATABASE database_name;` to create a new database for the app
+   (e.g., `recipe_app_db`). Exit PSQL with the `\q` command.
+4. Return to the Render dashboard, click the "New +" button, and select "Web
+   Service."
+5. Select the GitHub repo you want to deploy then, on the next page, give the app
+   a name and set the Environment to Ruby.
+6. Scroll down and enter the build command (`./bin/recipes-build.sh`) and start
+   command (`bundle exec puma -C config/puma.rb`)
+7. Scroll down and click "Advanced" then "Add Environment Variable." Add the
+   `DATABASE_URL` environment variable. Go to the database page on the Render
+   dashboard, scroll down to the "Connection" section, copy the "Internal
+   Database URL" and paste it in as the value; be sure to change the database
+   name at the end of the URL to `recipe_app_db` (or whatever you named it).
 8. Add the `RAILS_MASTER_KEY` environment variable; enter the key contained in
    the `master.key` file we created above as the value.
 9. Click the "Create Web Service" button at the bottom of the page.
@@ -383,7 +389,7 @@ or troubleshoot issues related to deployments in the future.
 Before you move on, make sure you can answer the following questions:
 
 1. Why does deploying the production version of our Rails/React app lead to
-   routing problems? What are the two ways we can fix the issue?
+   routing problems? What can we do to fix the issue?
 
 ## Resources
 
