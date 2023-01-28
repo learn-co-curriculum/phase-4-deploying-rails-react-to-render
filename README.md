@@ -37,8 +37,8 @@ frontend using React Router for client-side routing, and PostgreSQL for the
 database.
 
 Spend some time familiarizing yourself with the code for the demo app before
-proceeding. We'll be walking through its setup and why certain choices were
-made through the course of this lesson.
+proceeding. We'll be walking through its setup and why certain choices were made
+through the course of this lesson.
 
 ## React Production Build
 
@@ -126,8 +126,8 @@ Now you've seen how to build a production version of the React application
 locally, and some of the differences between this version and the development
 version you're more familiar with.
 
-There is one other issue with our React application to dive into before we deploy
-it: how can we deal with client-side routing?
+There is one other issue with our React application to dive into before we
+deploy it: how can we deal with client-side routing?
 
 ### Configuring Rails for Client-Side Routing
 
@@ -207,14 +207,14 @@ This action has just one job: to render the HTML file for our React application!
 > **Note**: It's important that this `FallbackController` inherits from
 > `ActionController::Base` instead of `ApplicationController`, which is what
 > your API controllers inherit from. Why? The `ApplicationController` class in a
-> Rails API inherits from the
-> [`ActionController::API` class][actioncontroller api], which doesn't include
-> the methods for rendering HTML. For our other controllers, this isn't a
-> problem, since they only need to render JSON responses. But for the
-> `FallbackController`, we need the ability to render an HTML file for our React
-> application.
+> Rails API inherits from the [`ActionController::API`
+> class][actioncontroller api], which doesn't include the methods for rendering
+> HTML. For our other controllers, this isn't a problem, since they only need to
+> render JSON responses. But for the `FallbackController`, we need the ability
+> to render an HTML file for our React application.
 
-[actioncontroller api]: https://api.rubyonrails.org/classes/ActionController/API.html
+[actioncontroller api]:
+  https://api.rubyonrails.org/classes/ActionController/API.html
 
 Experiment with the code above. Run `rails s` to run the application. Try
 commenting out the last line of the `routes.rb` file, and visit
@@ -253,7 +253,7 @@ see a `recipes-build.sh` file that contains the following:
 set -o errexit
 
 bundle install
-bundle exec rake db:migrate 
+bundle exec rake db:migrate
 ```
 
 This file runs the commands to build the Rails API portion of our app when
@@ -271,7 +271,7 @@ npm install --prefix client && npm run build --prefix client
 cp -a client/build/. public/
 
 bundle install
-bundle exec rake db:migrate 
+bundle exec rake db:migrate
 ```
 
 The code we added does the following whenever a build is launched:
@@ -320,8 +320,8 @@ encrypted version of the key. Then run the following command in the terminal:
 $ EDITOR="code --wait" bin/rails credentials:edit
 ```
 
-**Note**: if you use a different text editor than VS Code, you will need to replace
-`code` with the appropriate command.
+**Note**: if you use a different text editor than VS Code, you will need to
+replace `code` with the appropriate command.
 
 The command above will open a file in VS Code and "wait" for you to close it
 before completing the process of creating the credential files. You can edit the
@@ -347,8 +347,8 @@ earlier lesson.
    (e.g., `recipe_app_db`). Exit PSQL with the `\q` command.
 4. Return to the Render dashboard, click the "New +" button, and select "Web
    Service."
-5. Select the GitHub repo you want to deploy then, on the next page, give the app
-   a name and set the Environment to Ruby.
+5. Select the GitHub repo you want to deploy then, on the next page: a) give the
+   app a name, and b) set the Environment to Ruby.
 6. Scroll down and enter the build command (`./bin/recipes-build.sh`) and start
    command (`bundle exec puma -C config/puma.rb`)
 7. Scroll down and click "Advanced" then "Add Environment Variable." Add the
@@ -381,8 +381,8 @@ deployment process, we can make future deployments simpler.
 For your future projects using a React frontend and Rails API backend, we'll
 provide a template project to use so you don't have to worry about configuring
 the tricky parts of the deployment process yourself. However, it's helpful to
-have an understanding of this configuration should you wish to customize it
-or troubleshoot issues related to deployments in the future.
+have an understanding of this configuration should you wish to customize it or
+troubleshoot issues related to deployments in the future.
 
 ## Check For Understanding
 
@@ -396,6 +396,9 @@ Before you move on, make sure you can answer the following questions:
 - [Render Rails-React Setup](https://blog.Render.com/a-rock-solid-modern-web-stack)
 - [Demo App](https://github.com/learn-co-curriculum/phase-4-deploying-demo-app-render)
 
-[namespacing]: https://guides.rubyonrails.org/routing.html#controller-namespaces-and-routing
-[rails security]: https://guides.rubyonrails.org/security.html#environmental-security
-[client-side routing]: https://render.com/docs/deploy-create-react-app#using-client-side-routing
+[namespacing]:
+  https://guides.rubyonrails.org/routing.html#controller-namespaces-and-routing
+[rails security]:
+  https://guides.rubyonrails.org/security.html#environmental-security
+[client-side routing]:
+  https://render.com/docs/deploy-create-react-app#using-client-side-routing
